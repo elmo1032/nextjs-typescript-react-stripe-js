@@ -1,10 +1,9 @@
 import React from 'react';
-
 import products from '../data/products.json';
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
+import { useShop, addItem, removeItem, formatCurrencyString } from 'use-shopping-cart';
 
 const Products = () => {
-  const { addItem, removeItem } = useShoppingCart();
+  const { addItem: addToCart, removeItem: removeFromCart } = useShop();
 
   return (
     <section className="products">
@@ -20,13 +19,13 @@ const Products = () => {
           </p>
           <button
             className="cart-style-background"
-            onClick={() => addItem(product)}
+            onClick={() => addToCart(product)}
           >
             Add to cart
           </button>
           <button
             className="cart-style-background"
-            onClick={() => removeItem(product.sku)}
+            onClick={() => removeFromCart(product.sku)}
           >
             Remove
           </button>
