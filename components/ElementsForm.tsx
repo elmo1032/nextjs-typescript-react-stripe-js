@@ -1,15 +1,14 @@
+// Import required libraries and components
 import React, { useState } from 'react';
-
 import CustomDonationInput from '../components/CustomDonationInput';
 import StripeTestCards from '../components/StripeTestCards';
 import PrintObject from '../components/PrintObject';
-
 import { fetchPostJSON } from '../utils/api-helpers';
 import { formatAmountForDisplay } from '../utils/stripe-helpers';
 import * as config from '../config';
-
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
+// Define card options for Stripe CardElement
 const CARD_OPTIONS = {
   iconStyle: 'solid' as const,
   style: {
@@ -34,7 +33,9 @@ const CARD_OPTIONS = {
   },
 };
 
+// Define the main ElementsForm component
 const ElementsForm = () => {
+  // Initialize state variables
   const [input, setInput] = useState({
     customDonation: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),
     cardholderName: '',
@@ -44,7 +45,9 @@ const ElementsForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
+  // Define the PaymentStatus component
   const PaymentStatus = ({ status }: { status: string }) => {
+    // Handle different payment statuses
     switch (status) {
       case 'processing':
       case 'requires_payment_method':
@@ -55,12 +58,12 @@ const ElementsForm = () => {
         return <h2>Authenticating...</h2>;
 
       case 'succeeded':
-        return <h2>Payment Succeeded 🥳</h2>;
+        return <h2>Payment Succeeded ð¥³</h2>;
 
       case 'error':
         return (
           <>
-            <h2>Error 😭</h2>
+            <h2>Error ð­</h2>
             <p className="error-message">{errorMessage}</p>
           </>
         );
@@ -70,19 +73,21 @@ const ElementsForm = () => {
     }
   };
 
-  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) =>
+  // Handle input change events
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setInput({
       ...input,
       [e.currentTarget.name]: e.currentTarget.value,
     });
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Abort if form isn't valid
     if (!e.currentTarget.reportValidity()) return;
     setPayment({ status: 'processing' });
 
-    // Create a PaymentIntent with the specified amount.
+    // Create a PaymentIntent with the specified amount
     const response = await fetchPostJSON('/api/payment_intents', {
       amount: input.customDonation,
     });
@@ -94,12 +99,10 @@ const ElementsForm = () => {
       return;
     }
 
-    // Get a reference to a mounted CardElement. Elements knows how
-    // to find your CardElement because there can only ever be one of
-    // each type of element.
+    // Get a reference to the mounted CardElement
     const cardElement = elements!.getElement(CardElement);
 
-    // Use your card Element with other Stripe.js APIs
+    // Use the card element with other Stripe.js APIs
     const { error, paymentIntent } = await stripe!.confirmCardPayment(
       response.client_secret,
       {
@@ -112,12 +115,13 @@ const ElementsForm = () => {
 
     if (error) {
       setPayment({ status: 'error' });
-      setErrorMessage(error.message ?? 'An unknown error occured');
+      setErrorMessage(error.message ?? 'An unknown error occurred');
     } else if (paymentIntent) {
       setPayment(paymentIntent);
     }
   };
 
+  // Render the component
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -149,7 +153,7 @@ const ElementsForm = () => {
                 if (e.error) {
                   setPayment({ status: 'error' });
                   setErrorMessage(
-                    e.error.message ?? 'An unknown error occured'
+                    e.error.message ?? 'An unknown error occurred'
                   );
                 }
               }}
@@ -169,8 +173,4 @@ const ElementsForm = () => {
       </form>
       <PaymentStatus status={payment.status} />
       <PrintObject content={payment} />
-    </>
-  );
-};
-
-export default ElementsForm;
+    
