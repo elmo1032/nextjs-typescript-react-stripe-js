@@ -1,26 +1,29 @@
 import { buffer } from 'micro';
 import Cors from 'micro-cors';
 import { NextApiRequest, NextApiResponse } from 'next';
-
 import Stripe from 'stripe';
+
+// Initialize Stripe with the secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // https://github.com/stripe/stripe-node#configuration
   apiVersion: '2020-03-02',
 });
 
+// Retrieve the webhook secret from the environment variable
 const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET!;
 
-// Stripe requires the raw body to construct the event.
+// Configure the API to disable body parsing
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
+// Initialize CORS middleware
 const cors = Cors({
   allowMethods: ['POST', 'HEAD'],
 });
 
+// Define the webhook handler
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const buf = await buffer(req);
@@ -29,38 +32,29 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(
-        buf.toString(),
-        sig,
-        webhookSecret
-      );
+      // Construct the event using the raw body and signature
+      event = stripe.webhooks.constructEvent(buf.toString(), sig, webhookSecret);
     } catch (err) {
-      // On error, log and return the error message.
       console.log(`❌ Error message: ${err.message}`);
       res.status(400).send(`Webhook Error: ${err.message}`);
       return;
     }
 
-    // Successfully constructed event.
-    console.log('✅ Success:', event.id);
+    // Log the success and event ID
+    console.log('👍 Success:', event.id);
 
-    // Cast event data to Stripe object.
+    // Handle the different event types
     if (event.type === 'payment_intent.succeeded') {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      console.log(`💰 PaymentIntent status: ${paymentIntent.status}`);
+      handlePaymentIntentSucceeded(event);
     } else if (event.type === 'payment_intent.payment_failed') {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      console.log(
-        `❌ Payment failed: ${paymentIntent.last_payment_error?.message}`
-      );
+      handlePaymentIntentFailed(event);
     } else if (event.type === 'charge.succeeded') {
-      const charge = event.data.object as Stripe.Charge;
-      console.log(`💵 Charge id: ${charge.id}`);
+      handleChargeSucceeded(event);
     } else {
       console.warn(`🤷‍♀️ Unhandled event type: ${event.type}`);
     }
 
-    // Return a response to acknowledge receipt of the event.
+    // Send a response to acknowledge receipt of the event
     res.json({ received: true });
   } else {
     res.setHeader('Allow', 'POST');
@@ -68,4 +62,22 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
+// Define helper functions to handle the different event types
+const handlePaymentIntentSucceeded = (event: Stripe.Event) => {
+  const paymentIntent = event.data.object as Stripe.PaymentIntent;
+  console.log(`💰 PaymentIntent status: ${paymentIntent.status}`);
+};
+
+const handlePaymentIntentFailed = (event: Stripe.Event) => {
+  const paymentIntent = event.data.object as Stripe.PaymentIntent;
+  console.log(`❌ Payment failed: ${paymentIntent.last_payment_error?.message}`);
+};
+
+const handleChargeSucceeded = (event: Stripe.Event) => {
+  const charge = event.data.object as Stripe.Charge;
+  console.log(`💳 Charge id: ${charge.id}`);
+};
+
+// Export the webhook handler with CORS enabled
 export default cors(webhookHandler as any);
+
