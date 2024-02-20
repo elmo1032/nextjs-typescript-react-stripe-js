@@ -1,21 +1,20 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+import { ReactNode } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import logo from '/logo.png'; // Add the import statement for the logo image
 
 type Props = {
   children: ReactNode;
   title?: string;
 };
 
-const Layout = ({
-  children,
-  title = 'TypeScript Next.js Stripe Example',
-}: Props) => (
+const Layout = ({ children, title = 'TypeScript Next.js Stripe Example' }: Props) => (
   <>
     <Head>
       <title>{title}</title>
       <meta charSet="utf-8" />
-      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      <meta name="viewport" content="initial-scale=1.0, width=device-width," />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content="@thorwebdev" />
       <meta name="twitter:title" content="TypeScript Next.js Stripe Example" />
@@ -33,13 +32,13 @@ const Layout = ({
         <div className="header-content">
           <Link href="/">
             <a className="logo">
-              <img src="/logo.png" />
+              <img src={logo} alt="Logo" /> {/* Add an alt attribute for the logo image */}
             </a>
           </Link>
           <h1>
             <span className="light">Stripe Sample</span>
             <br />
-            Next.js, TypeScript, and Stripe 🔒💸
+            Next.js, TypeScript, and Stripe ðð¸
           </h1>
         </div>
       </header>
