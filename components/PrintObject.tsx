@@ -4,8 +4,8 @@ type Props = {
   content: object;
 };
 
-const PrintObject = ({ content }: Props) => {
-  const formattedContent: string = JSON.stringify(content, null, 2);
+const PrintObject: React.FC<Props> = ({ content }) => {
+  const formattedContent = JSON.stringify(content, null, 2);
   return <pre>{formattedContent}</pre>;
 };
 
