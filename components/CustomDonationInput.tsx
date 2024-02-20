@@ -23,7 +23,8 @@ const CustomDonationInput = ({
   className,
 }: Props) => (
   <label>
-    Custom donation amount ({formatAmountForDisplay(min, currency)}-
+    Custom donation amount (
+    {formatAmountForDisplay(min, currency)}-
     {formatAmountForDisplay(max, currency)}):
     <input
       className={className}
@@ -34,7 +35,7 @@ const CustomDonationInput = ({
       max={max}
       step={step}
       onChange={onChange}
-    ></input>
+    />
     <input
       type="range"
       name={name}
@@ -43,7 +44,7 @@ const CustomDonationInput = ({
       max={max}
       step={step}
       onChange={onChange}
-    ></input>
+    />
   </label>
 );
 
