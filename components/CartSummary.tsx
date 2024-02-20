@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
 import StripeTestCards from '../components/StripeTestCards';
-
 import { useShoppingCart } from 'use-shopping-cart';
 import { fetchPostJSON } from '../utils/api-helpers';
 
@@ -16,11 +15,11 @@ const CartSummary = () => {
     redirectToCheckout,
   } = useShoppingCart();
 
-  useEffect(() => setCartEmpty(!cartCount), [cartCount]);
+  useEffect(() => {
+    setCartEmpty(!cartCount);
+  }, [cartCount]);
 
-  const handleCheckout: React.FormEventHandler<HTMLFormElement> = async (
-    event
-  ) => {
+  const handleCheckout = async (event) => {
     event.preventDefault();
     setLoading(true);
 
@@ -40,15 +39,12 @@ const CartSummary = () => {
   return (
     <form onSubmit={handleCheckout}>
       <h2>Cart summary</h2>
-      {/* This is where we'll render our cart */}
       <p suppressHydrationWarning>
         <strong>Number of Items:</strong> {cartCount}
       </p>
       <p suppressHydrationWarning>
         <strong>Total:</strong> {formattedTotalPrice}
       </p>
-
-      {/* Redirects the user to Stripe */}
       <StripeTestCards />
       <button
         className="cart-style-background"
