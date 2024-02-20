@@ -1,13 +1,39 @@
+# Hidden files created by macOS
 .DS_Store
+
+# Configuration files for Visual Studio Code
 .vscode
 
-# Node files
+# Node.js dependency directories
 node_modules/
 
-# Typescript
-dist
+# Compiled TypeScript files
+dist/
 
-# Next.js
-.next
-.vercel
+# Next.js build output directories
+.next/
+.vercel/
+
+# Environment variable files
 .env*.local
+
+
+# Hidden files created by macOS
+.DS_Store
+
+# Configuration files for Visual Studio Code
+.vscode/
+
+# Node.js dependency directories
+node_modules/
+
+# Compiled TypeScript files
+dist/
+
+# Next.js build output directories
+.next/
+.vercel/
+
+# Environment variable files
+.env.local
+.env.*.local
