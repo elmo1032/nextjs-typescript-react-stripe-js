@@ -1,19 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-
-/*
- * Product data can be loaded from anywhere. In this case, we’re loading it from
- * a local JSON file, but this could also come from an async call to your
- * inventory management service, a database query, or some other API call.
- *
- * The important thing is that the product info is loaded from somewhere trusted
- * so you know the pricing information is accurate.
- */
 import { validateCartItems } from 'use-shopping-cart/src/serverUtil';
 import inventory from '../../../data/products.json';
-
 import Stripe from 'stripe';
+
+// Initialize Stripe with the secret key from environment variable
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // https://github.com/stripe/stripe-node#configuration
   apiVersion: '2020-03-02',
 });
 
@@ -23,10 +14,11 @@ export default async function handler(
 ) {
   if (req.method === 'POST') {
     try {
-      // Validate the cart details that were sent from the client.
+      // Validate the cart details sent from the client
       const cartItems = req.body;
-      const line_items = validateCartItems(inventory, cartItems);
-      // Create Checkout Sessions from body params.
+      const lineItems = validateCartItems(inventory, cartItems);
+
+      // Create Checkout Session from body params
       const params: Stripe.Checkout.SessionCreateParams = {
         submit_type: 'pay',
         payment_method_types: ['card'],
@@ -38,9 +30,8 @@ export default async function handler(
         success_url: `${req.headers.origin}/result?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${req.headers.origin}/use-shopping-cart`,
       };
-      const checkoutSession: Stripe.Checkout.Session = await stripe.checkout.sessions.create(
-        params
-      );
+
+      const checkoutSession: Stripe.Checkout.Session = await stripe.checkout.sessions.create(params);
 
       res.status(200).json(checkoutSession);
     } catch (err) {
