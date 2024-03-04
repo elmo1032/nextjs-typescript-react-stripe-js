@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatAmountForDisplay } from '../utils/stripe-helpers';
+import { formatAmountForDisplay } from '../utils/stripe-helpers'; // Importing the utility function to format the amount for display
 
 type Props = {
   name: string;
@@ -9,7 +9,7 @@ type Props = {
   currency: string;
   step: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
+  className?: string; // Optional className property
 };
 
 const CustomDonationInput = ({
@@ -24,11 +24,11 @@ const CustomDonationInput = ({
 }: Props) => (
   <label>
     Custom donation amount (
-    {formatAmountForDisplay(min, currency)}-
+    {formatAmountForDisplay(min, currency)}- // Display the minimum donation amount in the preferred currency format
     {formatAmountForDisplay(max, currency)}):
     <input
       className={className}
-      type="number"
+      type="number" // Using number type input for precise value input
       name={name}
       value={value}
       min={min}
@@ -37,7 +37,7 @@ const CustomDonationInput = ({
       onChange={onChange}
     />
     <input
-      type="range"
+      type="range" // Using range type input for visual representation of the value between min and max
       name={name}
       value={value}
       min={min}
