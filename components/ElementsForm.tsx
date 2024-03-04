@@ -10,6 +10,7 @@ import * as config from '../config';
 
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
+// Define the options for the CardElement
 const CARD_OPTIONS = {
   iconStyle: 'solid' as const,
   style: {
@@ -34,48 +35,26 @@ const CARD_OPTIONS = {
   },
 };
 
+// Define the main component for the form
 const ElementsForm = () => {
+  // Initialize state variables
   const [input, setInput] = useState({
     customDonation: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),
     cardholderName: '',
   });
   const [payment, setPayment] = useState({ status: 'initial' });
   const [errorMessage, setErrorMessage] = useState('');
-  const stripe = useStripe();
-  const elements = useElements();
+  const stripe = useStripe(); // Initialize the Stripe instance
+  const elements = useElements(); // Initialize the Elements instance
 
-  const PaymentStatus = ({ status }: { status: string }) => {
-    switch (status) {
-      case 'processing':
-      case 'requires_payment_method':
-      case 'requires_confirmation':
-        return <h2>Processing...</h2>;
-
-      case 'requires_action':
-        return <h2>Authenticating...</h2>;
-
-      case 'succeeded':
-        return <h2>Payment Succeeded 🥳</h2>;
-
-      case 'error':
-        return (
-          <>
-            <h2>Error 😭</h2>
-            <p className="error-message">{errorMessage}</p>
-          </>
-        );
-
-      default:
-        return null;
-    }
-  };
-
+  // Define a helper function for handling input changes
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) =>
     setInput({
       ...input,
       [e.currentTarget.name]: e.currentTarget.value,
     });
 
+  // Define a helper function for handling form submission
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     // Abort if form isn't valid
@@ -118,9 +97,11 @@ const ElementsForm = () => {
     }
   };
 
+  // Render the form and its components
   return (
     <>
       <form onSubmit={handleSubmit}>
+        {/* Render the custom donation input field */}
         <CustomDonationInput
           className="elements-style"
           name="customDonation"
@@ -131,9 +112,12 @@ const ElementsForm = () => {
           currency={config.CURRENCY}
           onChange={handleInputChange}
         />
+        {/* Render the Stripe test cards */}
         <StripeTestCards />
+        {/* Render the payment details fieldset */}
         <fieldset className="elements-style">
           <legend>Your payment details:</legend>
+          {/* Render the cardholder name input field */}
           <input
             placeholder="Cardholder name"
             className="elements-style"
@@ -142,6 +126,7 @@ const ElementsForm = () => {
             onChange={handleInputChange}
             required
           />
+          {/* Render the CardElement */}
           <div className="FormRow elements-style">
             <CardElement
               options={CARD_OPTIONS}
@@ -156,6 +141,7 @@ const ElementsForm = () => {
             />
           </div>
         </fieldset>
+        {/* Render the donation button */}
         <button
           className="elements-style-background"
           type="submit"
@@ -167,7 +153,9 @@ const ElementsForm = () => {
           Donate {formatAmountForDisplay(input.customDonation, config.CURRENCY)}
         </button>
       </form>
+      {/* Render the payment status component */}
       <PaymentStatus status={payment.status} />
+      {/* Render the PrintObject component */}
       <PrintObject content={payment} />
     </>
   );
